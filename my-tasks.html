@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مهامي</title>
+    <style>
+        :root {
+            --bg-color: #0c0c10;
+            --card-bg: rgba(22, 22, 30, 0.85);
+            --accent-color: #bb86fc;
+            --accent-green: #03dac6;
+            --accent-orange: #ffb74d;
+            --text-color: #f0f0f0;
+            --text-muted: #aaa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif;
+            background-color: var(--bg-color);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 0;
+            color: var(--text-color);
+            min-height: 100vh;
+            padding-bottom: 70px;
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(18, 18, 26, 0.95);
+            backdrop-filter: blur(15px);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 11px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            transition: 0.3s;
+        }
+
+        .nav-item.active {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .nav-item span.icon { font-size: 16px; }
+
+        .page {
+            display: none;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        .page.active { display: block; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            color: var(--accent-color);
+            font-size: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            padding: 18px;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 15px;
+        }
+
+        input, select, button, textarea {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: #1e1e28;
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 14px;
+            outline: none;
+        }
+
+        input[type="file"] { display: none; }
+
+        .upload-btn {
+            display: block;
+            text-align: center;
+            background: rgba(187, 134, 252, 0.1);
+            border: 1px dashed var(--accent-color);
+            cursor: pointer;
+            padding: 12px;
+            border-radius: 10px;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+
+        .btn-main {
+            background-color: var(--accent-color);
+            color: #000;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        ul { list-style: none; padding: 0; margin-top: 12px; }
+
+        li {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px;
+            margin-top: 8px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            word-break: break-word;
+        }
+
+        .task-actions { display: flex; gap: 6px; }
+
+        .action-btn {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+            width: auto;
+            margin: 0;
+        }
+
+        .check-btn { background: rgba(3, 218, 198, 0.2); }
+        .cross-btn { background: rgba(207, 102, 121, 0.2); }
+
+        #feedbackBox {
+            display: none;
+            padding: 10px 15px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            text-align: center;
+            font-weight: bold;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .feedback-success {
+            background: rgba(3, 218, 198, 0.15);
+            border: 1px solid var(--accent-green);
+            color: var(--accent-green);
+        }
+
+        .feedback-error {
+            background: rgba(207, 102, 121, 0.15);
+            border: 1px solid #cf6679;
+            color: #cf6679;
+        }
+
+        .chat-container {
+            height: 300px;
+            overflow-y: auto;
+            background: rgba(15, 15, 20, 0.6);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .chat-bubble {
+            padding: 10px 14px;
+            border-radius: 12px;
+            max-width: 80%;
+            font-size: 13px;
+            line-height: 1.4;
+            word-break: break-word;
+        }
+
+        .user-msg {
+            background: var(--accent-color);
+            color: #000;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .ai-msg {
+            background: #2a2a38;
+            color: #fff;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- الواجهة الأولى: الجدول اليومي -->
+    <div id="page-schedule" class="page active">
+        <h2>📅 جدول المهام والأيام</h2>
+        <div id="feedbackBox"></div>
+        <div class="card">
+            <label style="font-size: 13px; color: var(--text-muted);">اختر اليوم:</label>
+            <select id="daySelect">
+                <option value="السبت">السبت</option>
+                <option value="الأحد">الأحد</option>
+                <option value="الإثنين">الإثنين</option>
+                <option value="الثلاثاء">الثلاثاء</option>
+                <option value="الأربعاء">الأربعاء</option>
+                <option value="الخميس">الخميس</option>
+                <option value="الجمعة">الجمعة</option>
+            </select>
+            <input type="text" id="taskInput" placeholder="اكتبي مهمة لهذا اليوم...">
+            <button class="btn-main" onclick="addTask()">إضافة للمهام 📝</button>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:0; font-size:15px; color:#64b5f6;">المهام المسجلة:</h3>
+            <ul id="taskList"></ul>
+        </div>
+    </div>
+
+    <!-- الواجهة الثانية: إنجازات الشهر والتقييم التلقائي -->
+    <div id="page-achievements" class="page">
+        <h2>🏆 إنجازات الشهر والتقييم</h2>
+        
+        <!-- بطاقة التقييم التلقائي (بدون غش!) -->
+        <div class="card" style="border: 1px solid var(--accent-orange); text-align: center;">
+            <h3 style="margin-top:0; font-size:15px; color:var(--accent-orange);">📊 تقييمك التلقائي هذا الشهر:</h3>
+            <div id="autoStars" style="font-size: 22px; margin: 10px 0;">⭐⭐⭐⭐⭐</div>
+            <p id="autoRatingText" style="font-size: 13px; color: var(--text-muted);">جاري حساب إنجازاتك بمصداقية...</p>
+        </div>
+
+        <div class="card">
+            <input type="text" id="achievementInput" placeholder="سجلي إنجازاً يدوياً إذا حبيتِ...">
+            <button class="btn-main" style="background-color: var(--accent-green);" onclick="addManualAchievement()">تسجيل في الإنجازات ✨</button>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-top:0; font-size:15px; color:var(--accent-green);">سجل الإنجازات الحالي:</h3>
+            <ul id="achievementList"></ul>
+        </div>
+    </div>
+
+    <!-- الواجهة الثالثة: المساعد المستقل 𝑨𝒊𝒅𝒆𝒏 -->
+    <div id="page-ai" class="page">
+        <h2>🤖 المساعد 𝑨𝒊𝒅𝒆𝒏</h2>
+        <div class="card">
+            <div class="chat-container" id="chatBox">
+                <div class="chat-bubble ai-msg">أهلاً بكِ إيثار! أنا 𝑨𝒊𝒅𝒆𝒏، جاهز أرد عليكِ فوراً بدون أي تأخير 💡</div>
+            </div>
+            <input type="text" id="aiInput" placeholder="اسألي 𝑨𝒊𝒅𝒆𝒏 أي شيء هنا...">
+            <button class="btn-main" style="background-color: #bb86fc;" onclick="askAI()">إرسال لـ 𝑨𝒊𝒅𝒆𝒏 🚀</button>
+        </div>
+    </div>
+
+    <!-- الواجهة الرابعة: التنبيهات الدورية -->
+    <div id="page-notifications" class="page">
+        <h2>🔔 التنبيهات الدورية</h2>
+        <div class="card" style="text-align: center;">
+            <p style="font-size: 14px; color: var(--text-muted);">فعّلي التنبيهات عشان يوصلك كل ساعتين بالتمام والكمال:</p>
+            <p style="font-size: 13px; color: var(--accent-orange); font-weight: bold;">"لا تنسي جدولك اليومي يا ايثار"</p>
+            <button class="btn-main" style="background-color: var(--accent-orange);" onclick="enableNotifications()">تفعيل الإشعارات الآن ⏰</button>
+        </div>
+    </div>
+
+    <!-- الواجهة الخامسة: الإعدادات والخلفيات -->
+    <div id="page-settings" class="page">
+        <h2>⚙️ تخصيص التطبيق</h2>
+        <div class="card">
+            <h3 style="margin-top:0; font-size:15px; color:var(--accent-color);">🎨 خلفية التطبيق</h3>
+            <label for="bgImageInput" class="upload-btn">اختاري صورة من الاستديو 🖼️</label>
+            <input type="file" id="bgImageInput" accept="image/*" onchange="changeBackground(event)">
+        </div>
+    </div>
+
+    <!-- شريط التنقل السفلي -->
+    <div class="nav-bar">
+        <button class="nav-item active" onclick="switchPage('page-schedule', this)">
+            <span class="icon">📅</span>
+            <span>الجدول</span>
+        </button>
+        <button class="nav-item" onclick="switchPage('page-achievements', this)">
+            <span class="icon">🏆</span>
+            <span>الإنجازات</span>
+        </button>
+        <button class="nav-item" onclick="switchPage('page-ai', this)">
+            <span class="icon">🤖</span>
+            <span>𝑨𝒊𝒅𝒆𝒏</span>
+        </button>
+        <button class="nav-item" onclick="switchPage('page-notifications', this)">
+            <span class="icon">🔔</span>
+            <span>التنبيهات</span>
+        </button>
+        <button class="nav-item" onclick="switchPage('page-settings', this)">
+            <span class="icon">⚙️</span>
+            <span>الإعدادات</span>
+        </button>
+    </div>
+
+    <script>
+        const successMessages = [
+            "كفو يا إيثار! إنجاز عظيم يرفّع الرأس ✨",
+            "خطوة ممتازة نحو أهدافك يا مبدعة! 💪",
+            "ما شاء الله عليكِ، استمري بهذا التألق 🌟",
+            "بطلة! تم إنجاز المهمة بنجاح باهر 🚀",
+            "كل يوم تثبتين إنك قدها وأكثر يا إيثار 👑"
+        ];
+
+        window.onload = function() {
+            checkNewMonth();
+            updateAutoRating();
+        };
+
+        function checkNewMonth() {
+            const currentMonth = new Date().getMonth();
+            const savedMonth = localStorage.getItem('user_saved_month');
+
+            if (savedMonth === null) {
+                localStorage.setItem('user_saved_month', currentMonth);
+            } else if (parseInt(savedMonth) !== currentMonth) {
+                document.getElementById('achievementList').innerHTML = "";
+                localStorage.setItem('user_saved_month', currentMonth);
+                alert("🎉 مرحباً بكِ في شهر جديد! تم إعادة ضبط قائمة الإنجازات والتقييم تلقائياً.");
+            }
+        }
+
+        // دالة التقييم التلقائي بناءً على عدد الإنجازات بالمصداقية
+        function updateAutoRating() {
+            const achievementsCount = document.querySelectorAll('#achievementList li').length;
+            const starsContainer = document.getElementById('autoStars');
+            const textContainer = document.getElementById('autoRatingText');
+
+            let stars = "⭐";
+            let desc = "بداية الشهر، بانتظار إنجازاتكِ الرائعة!";
+
+            if (achievementsCount >= 15) {
+                stars = "⭐⭐⭐⭐⭐";
+                desc = "ممتاز جداً وأسطوري! أبدعتِ بكل ما تحمله الكلمة من معنى 🌟";
+            } else if (achievementsCount >= 10) {
+                stars = "⭐⭐⭐⭐";
+                desc = "جيد جداً! خطوتِ خطوات ضخمة نحو أهدافك 💪";
+            } else if (achievementsCount >= 5) {
+                stars = "⭐⭐⭐";
+                desc = "متوسط ومستمرة بثبات، استمري ولا تتوقفي ✨";
+            } else if (achievementsCount >= 1) {
+                stars = "⭐⭐";
+                desc = "بداية موفقة، الجاي أفضل وأقوى بكثير!";
+            }
+
+            starsContainer.textContent = stars;
+            textContainer.textContent = `أنجزتِ (${achievementsCount}) مهام حتى الآن. ${desc}`;
+        }
+
+        function switchPage(pageId, btnElement) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
+
+        function changeBackground(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.body.style.backgroundImage = `url('${e.target.result}')`;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function addTask() {
+            const day = document.getElementById('daySelect').value;
+            const input = document.getElementById('taskInput');
+            const text = input.value.trim();
+            if(text !== "") {
+                const ul = document.getElementById('taskList');
+                const li = document.createElement('li');
+                li.style.borderRight = "4px solid #64b5f6";
+                li.innerHTML = `
+                    <span><b>[${day}]</b> ${text}</span>
+                    <div class="task-actions">
+                        <button class="action-btn check-btn" onclick="completeTask(this, '${text}')" title="تم الانجاز">✔️</button>
+                        <button class="action-btn cross-btn" onclick="failTask(this)" title="لم يتم الانجاز">❌</button>
+                    </div>
+                `;
+                ul.appendChild(li);
+                input.value = "";
+            }
+        }
+
+        function completeTask(buttonElement, taskText) {
+            const li = buttonElement.closest('li');
+            li.remove();
+
+            const achieveUl = document.getElementById('achievementList');
+            const achieveLi = document.createElement('li');
+            achieveLi.style.borderRight = "4px solid var(--accent-green)";
+            achieveLi.innerHTML = `<span>🌟 ${taskText}</span>`;
+            achieveUl.appendChild(achieveLi);
+
+            // تحديث التقييم التلقائي مباشرة
+            updateAutoRating();
+
+            const randomMsg = successMessages[Math.floor(Math.random() * successMessages.length)];
+            showFeedback(randomMsg, 'success');
+        }
+
+        function failTask(buttonElement) {
+            const li = buttonElement.closest('li');
+            li.remove();
+            showFeedback("عادي حاولي بكرا لو تقدري 💪", 'error');
+        }
+
+        function showFeedback(message, type) {
+            const box = document.getElementById('feedbackBox');
+            box.textContent = message;
+            box.className = "";
+            if(type === 'success') {
+                box.classList.add('feedback-success');
+            } else {
+                box.classList.add('feedback-error');
+            }
+            box.style.display = 'block';
+
+            setTimeout(() => {
+                box.style.display = 'none';
+            }, 4000);
+        }
+
+        function addManualAchievement() {
+            const input = document.getElementById('achievementInput');
+            const text = input.value.trim();
+            if(text !== "") {
+                const ul = document.getElementById('achievementList');
+                const li = document.createElement('li');
+                li.style.borderRight = "4px solid var(--accent-green)";
+                li.innerHTML = `<span>🌟 ${text}</span>`;
+                ul.appendChild(li);
+                input.value = "";
+                updateAutoRating();
+            }
+        }
+
+        // مساعد Aiden سريع وسلس بدون أخطاء Time Out
+        function askAI() {
+            const input = document.getElementById('aiInput');
+            const question = input.value.trim().toLowerCase();
+            if(question === "") return;
+
+            const chatBox = document.getElementById('chatBox');
+
+            const userBubble = document.createElement('div');
+            userBubble.className = "chat-bubble user-msg";
+            userBubble.textContent = input.value;
+            chatBox.appendChild(userBubble);
+            const userQ = input.value;
+            input.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            const loadingBubble = document.createElement('div');
+            loadingBubble.className = "chat-bubble ai-msg";
+            loadingBubble.textContent = "𝑨𝒊𝒅𝒆𝒏 يكتب الرد... ✍️";
+            chatBox.appendChild(loadingBubble);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // محاكاة استجابة ذكية فورية ومضمونة بدون مشاكل إنترنت بطيء
+            setTimeout(() => {
+                let reply = "";
+                if (userQ.includes("مرحبا") || userQ.includes("السلام")) {
+                    reply = "أهلاً بكِ يا إيثار! كيف أقدر أساعدك بجدولك اليوم؟ ✨";
+                } else if (userQ.includes("جدول") || userQ.includes("مهمة")) {
+                    reply = "تأكدي من إضافة مهامك في خانة الجدول والضغط على علامة الصح فور إنجازها لتنزل في سجل الإنجازات تلقائياً! 📌";
+                } else if (userQ.includes("تحفيز") || userQ.includes("تعبت")) {
+                    reply = "أنتِ قدها يا إيثار! خذي استراحة قصيرة ثم عودي بقوة، إنجازاتك تسير بشكل رائع 🚀💪";
+                } else {
+                    reply = `أهلاً إيثار! لقد قرأت سؤالك "${userQ}"، وبصفتي مساعدك 𝑨𝒊𝒅𝒆𝒏 أنصحك بالاستمرار وتنظيم وققتك بذكاء وأنا دائماً بجانبك لدعمك! 💡`;
+                }
+                loadingBubble.textContent = reply;
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }, 600);
+        }
+
+        function enableNotifications() {
+            if (!("Notification" in window)) {
+                alert("المتصفح لا يدعم الإشعارات المباشرة.");
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                if (permission === "granted") {
+                    alert("تم تفعيل الإشعارات بنجاح! سيرسل لكِ التطبيق تذكيراً كل ساعتين.");
+                    sendNotification();
+                    setInterval(sendNotification, 7200000);
+                } else {
+                    alert("يرجى إعطاء إذن الإشعارات للهاتف.");
+                }
+            });
+        }
+
+        function sendNotification() {
+            new Notification("تذكير الجدول 📌", {
+                body: "لا تنسي جدولك اليومي يا ايثار",
+                icon: "https://cdn-icons-png.flaticon.com/512/3119/3119338.png"
+            });
+        }
+    </script>
+</body>
+</html>
